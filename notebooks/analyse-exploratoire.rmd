@@ -4,8 +4,80 @@ output: html_document
 date: "2025-2026"
 ---
 
+**Variables**
+
+On veut réussir à prédire si une exploitation est saine ou non, i.e. prédire la variable **DIFF**, à l'aide des variables suivantes donnant des indications sur la situation financière de l'exploitation :
+
+* **TOF** : Le type d'exploitation agricole (6 types différents encodés de 1 à 6. Aucun détail n'est donné sur ces types)
+* **AGE** : L'âge de l'exploitant.e
+* **R7** : Dette à long et moyen terme / produit brut
+* **R8** : Dette à court terme / produit brut
+* **R17** : Charges financières / dette totale
+* **R22** : (Charges financières + remboursement du capital à long et moyen terme) / EBITDA
+* **R32** : (EBITDA – charges financières) / produit brut
+
+
 ```{r}
+df <- read.csv("../data/farms_train.csv")
+head(df)
+```
+
+```{r}
+summary(df)
+
+# Nb NA par variable
+colSums(is.na(df))
 
 ```
 
-    
+
+```{r}
+num_cols <- df[, sapply(df, is.numeric)]
+
+
+# Nuage de points 2 à 2
+pairs(num_cols,
+      main = "Nuages de points 2 à 2",
+      pch = 19,
+      cex = 0.6,
+      col = rgb(0.2, 0.4, 0.8, 0.5))
+
+
+```
+
+```{r}
+vars_num <- c("TOF" , "AGE", "R7", "R8", "R17", "R22", "R32")
+
+par(mfrow = c(2, 3))
+for (v in vars_num) {
+  boxplot(df[[v]], main = v, col = "lightblue", pch = 20)
+}
+par(mfrow = c(1, 1))
+```
+```{r}
+library(ggplot2)
+
+X <- df[, c("TOF", "AGE", "R7", "R8", "R17", "R22", "R32")]
+y <- as.factor(df$DIFF)
+
+# 2. Réduction 2D  ACP (variables standardisées)
+pca <- prcomp(X, scale. = TRUE)
+df_pca <- data.frame(
+  PC1 = pca$x[, 1],
+  PC2 = pca$x[, 2],
+  DIFF = y
+)
+
+ggplot(df_pca, aes(x = PC1, y = PC2, color = DIFF)) +
+  geom_point(size = 3, alpha = 0.8) +
+  
+  labs(
+    title = "Projection ACP (2D) colorée par DIFF",
+    x = paste0("PC1 (", round(summary(pca)$importance[2,1] * 100, 1), "%)"),
+    y = paste0("PC2 (", round(summary(pca)$importance[2,2] * 100, 1), "%)")
+  ) +
+  theme_minimal()
+
+```
+
+
