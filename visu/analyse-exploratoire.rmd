@@ -19,7 +19,7 @@ On veut réussir à prédire si une exploitation est saine ou non, i.e. prédire
 
 ```{r}
 df <- read.csv("../data/farms_train.csv")
-head(df)
+head(df) 
 ```
 
 ```{r}
