@@ -1,0 +1,11 @@
+---
+title: "Analyse Exploratoires des donneés demie journées data Science - Seyverat Camille, Nafia Reda, Miranda Anthony"
+output: html_document
+date: "2025-2026"
+---
+
+```{r}
+
+```
+
+    
